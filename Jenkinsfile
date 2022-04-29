@@ -16,7 +16,6 @@ podTemplate(
         node(POD_LABEL) {
           stage('Get a Maven project') {
             sh "ls -la"
-            sh "sleep 600"
           }
           stage('docker') {
             sh 'docker version'
