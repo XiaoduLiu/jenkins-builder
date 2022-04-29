@@ -1,3 +1,5 @@
+#!/usr/bin/groovy
+
 podTemplate(
     cloud: 'us-west-2-devops',
     serviceAccount: 'jenkins',
