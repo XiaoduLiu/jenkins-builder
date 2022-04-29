@@ -18,7 +18,9 @@ podTemplate(
             sh "ls -la"
           }
           stage('docker') {
-            sh 'docker version'
+            container('docker') {
+              sh 'docker version'
+            }
           }
     }
 }
