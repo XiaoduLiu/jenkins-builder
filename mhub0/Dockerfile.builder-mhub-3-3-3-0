@@ -1,0 +1,33 @@
+FROM centos:7
+
+LABEL maintainer Patrick Colony
+
+# Updates & Install extras
+RUN yum update -y
+RUN yum install -y ksh wget
+
+ARG MHUB_VERSION=3-3-3-0
+ARG WAM_ARTIFACTORY_URL=http://artifactorydev.westernasset.com/artifactory
+ARG MHUB_ARTIFACT_PATH=${WAM_ARTIFACTORY_URL}/third-party-releases-local/com/abinitio/metadata-hub/${MHUB_VERSION}/metadata-hub-${MHUB_VERSION}.gz
+ARG ORACLE_JDBC_PATH=${WAM_ARTIFACTORY_URL}/repo/com/oracle/ojdbc8/12.2.0.1.0/ojdbc8-12.2.0.1.0.jar
+
+# Install MetaData Hub
+RUN mkdir -p /opt/abinitio3/mhub-deployments/mhub/config/{lib,datastores} \
+  && wget -nv ${ORACLE_JDBC_PATH} -P /opt/abinitio3/mhub-deployments/mhub/config/lib \
+  && wget -nv ${MHUB_ARTIFACT_PATH} -P /tmp \
+  && echo "Extracting Mhub tar..." \
+  && tar -C /opt/abinitio3 -zxf /tmp/metadata-hub-${MHUB_VERSION}.gz \
+  && rm /tmp/metadata-hub-${MHUB_VERSION}.gz
+
+COPY resources/null-mhub.properties /opt/abinitio3/mhub-deployments/mhub/config/datastores/null.properties
+
+# Install JDK 8
+RUN wget --quiet --header "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u162-b12/0da788060d494f5095bf8624735fa2f1/jdk-8u162-linux-x64.rpm \
+  && rpm -ih jdk-8u162-linux-x64.rpm \
+  && rm jdk-8u162-linux-x64.rpm
+
+# Setup the environment
+ENV JAVA_HOME /usr/java/jdk1.8.0_162
+ENV AB_MHUB_HOME /opt/abinitio3/metadata-hub-${MHUB_VERSION}
+ENV AB_MHUB_LOCAL_DIR /opt/abinitio3/mhub-deployments/mhub
+ENV PATH ${PATH}:${AB_MHUB_HOME}/admin-tools/bin:${JAVA_HOME}/bin:

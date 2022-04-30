@@ -1,0 +1,20 @@
+FROM microsoft/powershell:ubuntu16.04
+MAINTAINER "WAM DEVOPS <devops cop@westernasset.com>"
+
+ARG user=jenkins
+ARG group=jenkins
+ARG uid=1000
+ARG gid=1000
+
+ENV HOME /home/jenkins
+RUN groupadd -g ${gid} ${group}
+RUN useradd -d "/home/jenkins" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}"
+
+# Install Build dependencies
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends openssh-client
+RUN apt-get install -y --no-install-recommends openssh-server
+RUN apt-get clean
+RUN rm -rf /var/lib/apt/lists/*
+
+COPY resources/ca_userKeys /etc/ssh/ca_userKeys

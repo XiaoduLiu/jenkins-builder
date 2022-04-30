@@ -1,0 +1,10 @@
+@Library('wam-pipelines') _
+
+dockerImageBuild {
+  dockerFiles = [
+    "aws/Dockerfile.builder-python3.8.2-sam-1.37.0",
+  ]
+  imageTags = [
+     "python3.8.2-sam-1.37.0",
+  ]
+}

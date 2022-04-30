@@ -1,0 +1,8 @@
+{{$secretroot := env "SECRET_ROOT"}}
+{{with secret (printf "%s" $secretroot)}}
+driver: {{.Data.liquibase_db_driver}}
+classpath: /opt/resources/liquibase/{{.Data.liquibase_db_jar}}
+url: {{.Data.liquibase_db_url}}
+username: {{.Data.liquibase_db_username}}
+password: {{.Data.liquibase_db_password}}
+{{end}}

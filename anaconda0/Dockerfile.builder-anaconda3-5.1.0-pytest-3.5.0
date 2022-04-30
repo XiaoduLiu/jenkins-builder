@@ -1,0 +1,46 @@
+FROM continuumio/anaconda3:5.1.0
+
+ARG user=jenkins
+ARG group=jenkins
+ARG uid=1000
+ARG gid=1000
+ARG USER_HOME_DIR=/home/${user}
+
+ENV JENKINS_AGENT_HOME ${USER_HOME_DIR}
+
+RUN groupadd -g ${gid} ${group}
+RUN useradd -d "${JENKINS_AGENT_HOME}" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}"
+
+# Install Build dependencies
+RUN apt-get update
+RUN apt-get install -y ca-certificates
+RUN apt-get install -y libaio1 curl unzip
+RUN apt-get clean
+RUN rm -rf /var/lib/apt/lists/*
+
+# Install any needed packages specified in requirements.txt
+RUN pip install --upgrade --trusted-host pypi.org --trusted-host files.pythonhosted.org pip
+RUN pip install --upgrade --trusted-host pypi.org --trusted-host files.pythonhosted.org cx_Oracle
+RUN pip install --upgrade --trusted-host pypi.org --trusted-host files.pythonhosted.org flask
+RUN pip install --upgrade --trusted-host pypi.org --trusted-host files.pythonhosted.org pytest
+RUN pip install --upgrade --trusted-host pypi.org --trusted-host files.pythonhosted.org pytest-bdd
+RUN pip install --upgrade --trusted-host pypi.org --trusted-host files.pythonhosted.org pytest-flask
+RUN pip install --upgrade --trusted-host pypi.org --trusted-host files.pythonhosted.org coverage
+RUN pip install --upgrade --trusted-host pypi.org --trusted-host files.pythonhosted.org hypothesis==3.56.5
+RUN pip install --upgrade --trusted-host pypi.org --trusted-host files.pythonhosted.org numpy==1.14.2
+RUN pip install --upgrade --trusted-host pypi.org --trusted-host files.pythonhosted.org pandas==0.22.0
+RUN pip install --upgrade --trusted-host pypi.org --trusted-host files.pythonhosted.org pylint
+
+RUN mkdir -p /opt/oracle
+RUN cd /opt/oracle \
+    && curl -O http://artifactory.westernasset.com/artifactory/repo/com/oracle/instantclient-basic-linux/x64-12.2.0.1.0/instantclient-basic-linux-x64-12.2.0.1.0.zip \
+    && unzip instantclient-basic-linux-x64-12.2.0.1.0.zip \
+    && rm instantclient-basic-linux-x64-12.2.0.1.0.zip
+
+RUN sh -c "echo /opt/oracle/instantclient_12_2 > /etc/ld.so.conf.d/oracle-instantclient.conf"
+RUN ldconfig
+
+ENV LD_LIBRARY_PATH /opt/oracle/instantclient_12_2
+
+RUN mkdir /opt/pylint
+COPY resources/pylintrc /opt/pylint/pylintrc

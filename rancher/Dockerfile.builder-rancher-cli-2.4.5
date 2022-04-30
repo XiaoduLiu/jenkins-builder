@@ -1,0 +1,19 @@
+FROM alpine:3.12.0
+LABEL maintainer="DevOps <devops@westernasset.com>"
+
+ENV VERSION=2.4.5
+
+RUN apk update -qq \
+  && apk add --no-cache curl \
+  && rm -rf /var/lib/{apt,dpkg,cache,log}/ /tmp/* /var/tmp/*
+
+RUN curl -fsSLO https://github.com/rancher/cli/releases/download/v${VERSION}/rancher-linux-amd64-v${VERSION}.tar.gz && \
+  tar --strip-components=2 -xzvf rancher-linux-amd64-v${VERSION}.tar.gz -C /usr/local/bin && \
+  chmod +x /usr/local/bin/rancher && \
+  rm -f rancher-linux-amd64-v${VERSION}.tar.gz
+
+ENV HOME /home/jenkins
+RUN addgroup -S -g 1000 jenkins
+RUN adduser -S -u 1000 -h $HOME -G jenkins jenkins
+
+USER jenkins

@@ -1,0 +1,17 @@
+FROM imagehub.westernasset.com/docker-local-snapshot/imrs-platform/docker-images:python-3.7.6-latest
+
+#### JENKINS REQUIREMENTS
+
+ARG user=jenkins
+ARG group=jenkins
+ARG uid=1000
+ARG gid=1000
+ARG USER_HOME_DIR=/home/${user}
+
+ENV JENKINS_AGENT_HOME ${USER_HOME_DIR}
+
+RUN groupadd -g ${gid} ${group}
+RUN useradd -d "${JENKINS_AGENT_HOME}" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}"
+
+# Installing Virtualenv Since can be a shared container
+RUN python3 -m pip install virtualenv --trusted-host pypi.python.org --trusted-host pypi.org --trusted-host files.pythonhosted.org

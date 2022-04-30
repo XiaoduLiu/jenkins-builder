@@ -1,0 +1,31 @@
+FROM node:12.18.2-buster
+LABEL maintainer="devops@westernasset.com"
+
+# Create the jenkins user & group.
+ARG user=jenkins
+ARG uid=1001
+ARG gid=1000
+ARG USER_HOME_DIR=/home/${user}
+
+ENV JENKINS_AGENT_HOME ${USER_HOME_DIR}
+RUN useradd -d "${JENKINS_AGENT_HOME}" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}"
+
+ENV AWSCDK_VERSION 1.50.0
+
+RUN npm config set unsafe-perm true
+
+RUN npm install -g aws-cdk@${AWSCDK_VERSION}
+RUN npm install typescript@latest
+RUN npm install @types/node@latest
+
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+RUN unzip awscliv2.zip
+RUN ./aws/install -i /usr/local/aws-cli -b /usr/local/bin
+
+# Install Build dependencies
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends jq unzip curl git \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
+
+USER jenkins

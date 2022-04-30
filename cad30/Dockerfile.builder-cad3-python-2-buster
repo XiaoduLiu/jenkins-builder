@@ -1,0 +1,1 @@
+FROM imagehub.westernasset.com/docker-remote/python:2-buster

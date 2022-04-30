@@ -1,0 +1,27 @@
+FROM ubuntu:20.04
+
+ENV TERRAGRUNT_VERSION=0.26.7
+ENV TERRAFORM_VERSION=0.14.3
+
+RUN apt-get update \
+  && apt-get install -y unzip wget bash git openssh-client curl \
+  && rm -rf /var/lib/apt/lists/*
+
+# Install Terraform
+RUN wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip \
+ && unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip \
+ && mv terraform /usr/local/bin/terraform \
+ && rm terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+
+# Install Terragrunt
+ADD https://github.com/gruntwork-io/terragrunt/releases/download/v${TERRAGRUNT_VERSION}/terragrunt_linux_amd64 /usr/local/bin/terragrunt
+RUN chmod +x /usr/local/bin/terragrunt
+
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+RUN install -o root -g root -m 0777 kubectl /usr/local/bin/kubectl
+
+ENV HOME /home/jenkins
+RUN groupadd -g 1000 jenkins
+RUN useradd -d /home/jenkins -u 1000 -g 1000 -m -s /bin/bash jenkins
+
+USER jenkins

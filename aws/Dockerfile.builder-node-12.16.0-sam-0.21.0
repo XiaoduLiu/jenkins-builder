@@ -1,0 +1,23 @@
+FROM node:12.16.0-buster
+LABEL maintainer="WAM DEVOPS <devops@westernasset.com>"
+
+# Create the jenkins user & group.
+ARG user=jenkins
+ARG group=jenkins
+ARG uid=1001
+ARG gid=1001
+ARG USER_HOME_DIR=/home/${user}
+
+ENV LC_ALL C.UTF-8
+ENV LANG C.UTF-8
+
+RUN groupadd -g ${gid} ${group}
+RUN useradd -d "${USER_HOME_DIR}" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}"
+
+RUN apt-get update \
+ && apt-get install -y python3.7 python3-pip \
+ && rm -rf /var/lib/apt/lists/*
+RUN pip3 install awscli==1.16.230 --upgrade
+RUN pip3 install aws-sam-cli==0.21.0 --upgrade
+
+USER jenkins

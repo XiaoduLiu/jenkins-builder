@@ -1,0 +1,44 @@
+FROM openjdk:8u151
+LABEL maintainer louie.liu@westernasset.com
+
+ARG user=jenkins
+ARG group=jenkins
+ARG CONSUL_TEMPLATE_VERSION=0.19.4
+ARG uid=1000
+ARG gid=1000
+ARG USER_HOME_DIR=/home/${user}
+
+# Run time variables
+ENV JENKINS_AGENT_HOME ${USER_HOME_DIR}
+ENV LIQUIBASE_VERSION="3.5.3"
+ENV TZ='America/Los_Angeles'
+
+RUN groupadd -g ${gid} ${group}
+RUN useradd -d "${JENKINS_AGENT_HOME}" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}"
+
+# Install Build dependencies
+RUN apt-get update
+RUN apt-get install -y dateutils
+RUN apt-get install -y --no-install-recommends jq
+RUN apt-get install -y --no-install-recommends unzip
+RUN apt-get clean
+RUN rm -rf /var/lib/apt/lists/*
+
+RUN wget -q -O /tmp/liquibase.tar.gz "https://github.com/liquibase/liquibase/releases/download/liquibase-parent-${LIQUIBASE_VERSION}/liquibase-${LIQUIBASE_VERSION}-bin.tar.gz"
+RUN mkdir -p /opt/resources/liquibase
+RUN tar -xzf /tmp/liquibase.tar.gz -C /opt/resources/liquibase
+RUN rm -f /tmp/liquibase.tar.gz
+RUN chmod +x /opt/resources/liquibase/liquibase
+RUN ln -s /opt/resources/liquibase/liquibase /usr/local/bin/
+
+RUN cd /opt/resources/liquibase \
+ && curl -O http://repo.maven.apache.org/maven2/com/microsoft/sqlserver/mssql-jdbc/6.1.0.jre8/mssql-jdbc-6.1.0.jre8.jar
+
+# Install Consul-template
+RUN cd /opt/resources/liquibase \
+ && curl -O https://releases.hashicorp.com/consul-template/${CONSUL_TEMPLATE_VERSION}/consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip \
+ && unzip consul-template_${CONSUL_TEMPLATE_VERSION}_linux_amd64.zip
+
+RUN chown -R jenkins:jenkins /opt/resources
+
+USER jenkins

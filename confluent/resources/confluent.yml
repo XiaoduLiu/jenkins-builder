@@ -1,0 +1,24 @@
+---
+version: '3.3'
+services:
+  web:
+    image: confluentinc/cp-enterprise-control-center:4.1.0
+    ports:
+      - "9021:9021"
+    environment:
+     - CONTROL_CENTER_BOOTSTRAP_SERVERS=r0.pkc-4jvm4.us-west-1.aws.confluent.cloud:9092,r0.pkc-4jvm4.us-west-1.aws.confluent.cloud:9093,r0.pkc-4jvm4.us-west-1.aws.confluent.cloud:9094
+     - CONTROL_CENTER_REPLICATION_FACTOR=3
+     - CONTROL_CENTER_STREAMS_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username="G3UHDCPKXRXIF4IB"  password="TQLEuWRaVUJbdYuAl/5igPiXh3ZgOfBQ/yQdxkBubW2yiu4CkGV3njniewJGj5yD";
+     - CONTROL_CENTER_STREAMS_SASL_MECHANISM=PLAIN
+     - CONTROL_CENTER_STREAMS_SECURITY_PROTOCOL=SASL_PLAINTEXT
+     - CONTROL_CENTER_STREAMS_SECURITY_PROTOCOL=SASL_SSL
+     - CONTROL_CENTER_STREAMS_PRODUCER_SECURITY_PROTOCOL=SASL_SSL
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          memory: 4096M
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.role == worker]

@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: jenkins-oracle-xe
+  labels:
+    app: jenkins
+spec:
+  serviceName: jenkins-oracle-xe
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins-oracle-xe
+  template:
+    metadata:
+      labels:
+        app: jenkins-oracle-xe
+    spec:
+      terminationGracePeriodSeconds: 1800
+      securityContext:
+        fsGroup: 54321
+      containers:
+      - name: jenkins-oracle-xe
+        image: imagehub.westernasset.com/docker-local/devops/jenkins-builder:oracle-xe-18.4.0
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: ORACLE_PWD
+          valueFrom:
+            secretKeyRef:
+              name: devops-jenkins-builder-oracle-xe
+              key: db-passwd
+        ports:
+        - containerPort: 1521
+          name: listener-port
+        resources:
+          limits:
+            memory: 2500Mi
+          requests:
+            memory: 2500Mi
+        volumeMounts:
+          - name: oradata
+            mountPath: /opt/oracle/oradata
+          - name: dshm
+            mountPath: /dev/shm
+      volumes:
+       - name: dshm
+         emptyDir:
+           medium: Memory
+  volumeClaimTemplates:
+  - metadata:
+      name: oradata
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: portworx-builder-nodes-unshared-sc
+      resources:
+        requests:
+          storage: 10Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: oracle-xe
+  namespace: devops-jenkins
+spec:
+  selector:
+    app: jenkins-oracle-xe
+  ports:
+    -
+      name: listener-port
+      port: 1521
+      targetPort: 1521
+      protocol: TCP

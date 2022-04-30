@@ -1,0 +1,33 @@
+FROM node:12.18.3-buster
+LABEL maintainer="devops@westernasset.com"
+
+# Create the jenkins user & group.
+ARG user=jenkins
+ARG group=node
+ARG uid=1000
+ARG gid=1000
+ARG home=/home/${user}
+
+ENV LC_ALL C.UTF-8
+ENV LANG C.UTF-8
+
+RUN usermod -u 1001 node
+RUN useradd -d "${home}" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}"
+
+RUN apt-get update
+RUN apt-get install -y git jq unzip gcc groff less
+RUN apt-get clean
+RUN rm -rf /var/lib/apt/lists/*
+
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+RUN unzip awscliv2.zip
+RUN ./aws/install
+
+ENV AWSCDK_VERSION 1.78.0
+
+RUN npm config set unsafe-perm true
+RUN npm install -g aws-cdk@${AWSCDK_VERSION}
+RUN npm install typescript@latest
+RUN npm install @types/node@latest
+
+USER jenkins

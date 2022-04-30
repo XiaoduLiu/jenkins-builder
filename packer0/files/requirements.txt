@@ -1,0 +1,4 @@
+pywinrm
+requests
+boto
+# ansible

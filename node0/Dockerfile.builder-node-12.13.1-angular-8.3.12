@@ -1,0 +1,15 @@
+FROM node:12.13.1-alpine3.10
+# Create the jenkins user & group.
+ARG user=jenkins
+ARG group=node
+ARG home=/home/${user}
+ARG uid=1000
+
+RUN apk update && apk upgrade
+RUN apk add --no-cache --update git shadow jq
+
+RUN usermod -u 1001 node
+RUN adduser -G ${group} -u ${uid} -g "Jenkins User" -h ${home} -s /bin/bash -D ${user}
+
+# Install Angular CLI
+RUN npm install -g @angular/cli@8.3.12

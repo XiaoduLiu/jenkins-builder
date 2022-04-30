@@ -1,0 +1,1 @@
+FROM cytopia/ansible:2.9-aws

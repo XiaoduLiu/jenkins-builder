@@ -1,0 +1,39 @@
+FROM ubuntu:14.04
+LABEL maintainer devops@westernasset.com
+
+ARG user=jenkins
+ARG group=jenkins
+ARG uid=1000
+ARG gid=1000
+ARG MAVEN_VERSION=
+ARG USER_HOME_DIR=/home/${user}
+
+ENV JENKINS_AGENT_HOME ${USER_HOME_DIR}
+
+RUN groupadd -g ${gid} ${group}
+RUN useradd -d "${JENKINS_AGENT_HOME}" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}"
+
+# Install Build dependencies
+RUN apt-get update
+RUN apt-get install -y dateutils
+RUN apt-get install -y --no-install-recommends jq unzip curl git openssh-client
+RUN apt-get clean
+RUN rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /usr/share/jdk
+RUN curl -fsSLk -o /usr/share/jdk/jdk-8u60-linux-x64.tar.gz http://artifactory.westernasset.com/artifactory/repo/com/oracle/jdk8/8u60/jdk-8u60-linux-x64.tar.gz
+RUN cd /usr/share/jdk \
+ && tar zxvf jdk-8u60-linux-x64.tar.gz
+
+RUN mkdir -p /usr/share/maven /usr/share/maven/ref
+RUN curl -fsSLk -o /tmp/apache-maven.tar.gz https://archive.apache.org/dist/maven/maven-3/3.2.1/binaries/apache-maven-3.2.1-bin.tar.gz
+
+RUN tar -xzf /tmp/apache-maven.tar.gz -C /usr/share/maven --strip-components=1
+RUN rm -f /tmp/apache-maven.tar.gz
+RUN ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
+
+# Run time variables
+ENV TZ='America/Los_Angeles'
+ENV JAVA_HOME='/usr/share/jdk/jdk1.8.0_60'
+
+USER jenkins

@@ -1,0 +1,19 @@
+FROM ubuntu:20.04
+
+ENV VERSION=0.15.0
+
+RUN apt-get update \
+ && apt-get install -y wget unzip lsb-release curl apt-transport-https git \
+ && rm -rf /var/lib/apt/lists/*
+
+# Install Terraform
+RUN wget https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_linux_amd64.zip \
+ && unzip terraform_${VERSION}_linux_amd64.zip \
+ && mv terraform /usr/local/bin/terraform \
+ && rm terraform_${VERSION}_linux_amd64.zip
+
+ENV HOME /home/jenkins
+RUN groupadd -g 1000 jenkins
+RUN useradd -d /home/jenkins -u 1000 -g 1000 -m -s /bin/bash jenkins
+
+USER jenkins

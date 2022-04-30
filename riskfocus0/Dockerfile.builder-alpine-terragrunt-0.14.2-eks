@@ -1,0 +1,1 @@
+FROM alpine/terragrunt:0.14.2-eks

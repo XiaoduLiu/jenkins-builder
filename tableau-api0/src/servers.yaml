@@ -1,0 +1,9 @@
+dev:
+  url: "https://tableaudev.westernasset.com"
+  site: ""
+qa:
+  url: "http://tableaudev.westernasset.com"
+  site: "QA"
+prod:
+  url: "https://tableau.westernasset.com"
+  site: ""  

@@ -1,0 +1,25 @@
+FROM openjdk:11.0.7
+LABEL maintainer="WAM DEVOPS <devops@westernasset.com>"
+
+ARG user=jenkins
+ARG group=jenkins
+ARG uid=1000
+ARG gid=1000
+ARG USER_HOME_DIR=/home/${user}
+
+ENV JENKINS_AGENT_HOME ${USER_HOME_DIR}
+
+RUN groupadd -g ${gid} ${group}
+RUN useradd -d "${JENKINS_AGENT_HOME}" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}"
+
+# Install Build dependencies
+RUN apt-get update
+RUN apt-get install -y apt-utils bash-completion
+RUN apt-get clean
+RUN rm -rf /var/lib/apt/lists/*
+
+RUN wget -q -O /tmp/confluent_latest_linux_amd64.tar.gz "https://s3-us-west-2.amazonaws.com/confluent.cloud/confluent-cli/archives/latest/confluent_latest_linux_amd64.tar.gz"
+WORKDIR /opt/confluent
+RUN tar -xzf /tmp/confluent_latest_linux_amd64.tar.gz -C /opt
+
+RUN ln -s /opt/confluent/confluent /usr/local/bin/confluent

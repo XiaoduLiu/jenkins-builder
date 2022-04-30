@@ -1,0 +1,5 @@
+FROM imagehub.westernasset.com/docker/devops/jenkins-builder:julia-1.2.0
+
+RUN apt-get update \
+    && apt-get install -y python3.7 python3-pip \
+    && rm -rf /var/lib/apt/lists/*

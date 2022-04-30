@@ -1,0 +1,11 @@
+{{$secretroot := env "SECRET_ROOT"}}
+{{with secret (printf "%s" $secretroot)}}
+def getSecretMap() {[
+
+username: '{{.Data.username}}',
+password: '{{.Data.password}}'
+
+]}
+
+return this
+{{end}}

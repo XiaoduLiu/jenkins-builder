@@ -1,0 +1,35 @@
+FROM openjdk:11.0.7
+LABEL maintainer="WAM DEVOPS <devops@westernasset.com>"
+
+ARG user=jenkins
+ARG group=jenkins
+ARG uid=1000
+ARG gid=1000
+ARG USER_HOME_DIR=/home/${user}
+
+ENV JENKINS_AGENT_HOME ${USER_HOME_DIR}
+
+RUN groupadd -g ${gid} ${group}
+RUN useradd -d "${JENKINS_AGENT_HOME}" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}"
+
+# Install Build dependencies
+RUN apt-get update
+RUN apt-get install -y apt-utils expect jq
+RUN apt-get clean
+RUN rm -rf /var/lib/apt/lists/*
+
+COPY resources/ccloud_login.sh /usr/local/bin/ccloud_login.sh
+RUN chmod +x /usr/local/bin/ccloud_login.sh
+
+# Install Vault
+ENV VAULT_VERSION 1.4.1
+ADD https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip /tmp/vault.zip
+
+RUN unzip /tmp/vault.zip -d /usr/bin && \
+    chmod +x /usr/bin/vault && \
+    rm /tmp/vault.zip
+
+WORKDIR /opt/confluent
+RUN curl -L --http1.1 https://cnfl.io/ccloud-cli | sh -s -- -b /usr/local/bin
+
+USER jenkins

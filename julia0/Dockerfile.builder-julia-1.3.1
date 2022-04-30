@@ -1,0 +1,39 @@
+FROM julia:1.3.1
+
+# Oracle setup
+RUN apt-get update \
+    && apt-get install -y git openssh-client unzip libaio1 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/oracle
+
+RUN curl -O http://artifactory.westernasset.com/artifactory/repo/com/oracle/instantclient-basic-linux/x64-12.2.0.1.0/instantclient-basic-linux-x64-12.2.0.1.0.zip \
+    && unzip instantclient-basic-linux-x64-12.2.0.1.0.zip \
+    && rm instantclient-basic-linux-x64-12.2.0.1.0.zip
+
+ENV ORACLE_HOME /opt/oracle/instantclient_12_2
+ENV LD_LIBRARY_PATH ${ORACLE_HOME}:${LD_LIBRARY_PATH}
+
+WORKDIR ${ORACLE_HOME}
+
+RUN ln -s libclntsh.so.12.1 libclntsh.so \
+    && ln -s libocci.so.12.1 libocci.so \
+    && sh -c "echo ${ORACLE_HOME} > /etc/ld.so.conf.d/oracle-instantclient.conf" \
+    && ldconfig \
+    && mkdir -p ${ORACLE_HOME}/network/admin
+
+COPY conf/tnsnames.ora ${ORACLE_HOME}/network/admin/
+
+# Jenkins setup
+ARG user=jenkins
+ARG group=jenkins
+ARG uid=1000
+ARG gid=1000
+ARG USER_HOME_DIR=/home/${user}
+
+ENV JENKINS_AGENT_HOME ${USER_HOME_DIR}
+
+RUN groupadd -g ${gid} ${group}
+RUN useradd -d "${JENKINS_AGENT_HOME}" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}"
+
+WORKDIR ${USER_HOME_DIR}

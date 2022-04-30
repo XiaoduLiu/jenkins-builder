@@ -1,0 +1,34 @@
+FROM sqitch/sqitch:1.0.0
+LABEL maintainer devops@westernasset.com
+
+ARG user=jenkins
+ARG group=jenkins
+ARG uid=1000
+ARG gid=1000
+ARG USER_HOME_DIR="/home/jenkins"
+
+USER root
+
+# Install Build dependencies
+RUN apt-get update
+RUN apt-get install -y curl unixodbc
+RUN apt-get clean
+RUN rm -rf /var/lib/apt/lists/*
+
+RUN groupadd -g ${gid} ${group}
+RUN useradd -d "${USER_HOME_DIR}" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}"
+
+RUN cd /opt \
+    && curl -O https://sfc-repo.snowflakecomputing.com/odbc/linux/2.20.0/snowflake-odbc-2.20.0.x86_64.deb \
+    && dpkg -i snowflake-odbc-2.20.0.x86_64.deb
+
+RUN cd /opt \
+    && curl -o snowsql-1.1.85-linux_x86_64.bash http://s3-us-west-2.amazonaws.com/sfc-snowsql-updates/bootstrap/1.1/linux_x86_64/snowsql-1.1.85-linux_x86_64.bash \
+    && pwd && ls -la \
+    && SNOWSQL_DEST=/opt/snowsql/bin SNOWSQL_LOGIN_SHELL=~/.profile bash snowsql-1.1.85-linux_x86_64.bash
+
+ENTRYPOINT []
+
+USER jenkins
+
+COPY conf/snowsql.ctmpl /opt/snowsql.ctmpl
