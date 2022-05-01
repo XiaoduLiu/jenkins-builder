@@ -1,5 +1,5 @@
 FROM docker.devops.aws.aristotlecap.com/node:17.8.0-buster
-LABEL maintainer="devops@westernasset.com"
+LABEL maintainer="devops@aristotlecap.com"
 
 # Create the jenkins user & group.
 ARG user=jenkins
@@ -15,7 +15,7 @@ RUN usermod -u 1001 node
 RUN useradd -d "${home}" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}"
 
 RUN apt-get update
-RUN apt-get install -y git jq unzip gcc groff less
+RUN apt-get install -y git jq unzip gcc
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
 
