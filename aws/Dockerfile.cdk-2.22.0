@@ -1,4 +1,4 @@
-FROM imagehub.westernasset.com/docker-remote/node:17.8.0-buster
+FROM docker.devops.aws.aristotlecap.com/node:17.8.0-buster
 LABEL maintainer="devops@westernasset.com"
 
 # Create the jenkins user & group.
