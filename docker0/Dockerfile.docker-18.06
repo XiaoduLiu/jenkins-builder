@@ -1,3 +1,0 @@
-FROM docker:18.06
-
-RUN	apk --update add curl

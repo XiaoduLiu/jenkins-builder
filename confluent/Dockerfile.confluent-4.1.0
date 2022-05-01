@@ -1,5 +1,0 @@
-FROM confluentinc/cp-enterprise-control-center:4.1.0
-
-COPY resources/kafka_client_jaas.conf /tmp/kafka_client_jaas.conf
-
-CMD ["/etc/confluent/docker/run"]

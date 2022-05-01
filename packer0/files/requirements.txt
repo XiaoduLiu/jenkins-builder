@@ -1,4 +1,0 @@
-pywinrm
-requests
-boto
-# ansible

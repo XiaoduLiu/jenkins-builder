@@ -1,1 +1,0 @@
-FROM alpine/terragrunt:0.12.20-eks

@@ -1,8 +1,0 @@
-{{$secretroot := env "SECRET_ROOT"}}{{with secret (printf "%s" $secretroot)}}
-env.SNOWSQL_DB = '{{.Data.snowflake_db}}'
-env.SNOWSQL_USER = '{{.Data.snowflake_uid}}'
-env.SNOWSQL_PWD = '{{.Data.snowflake_pwd}}'
-env.SNOWSQL_ACCOUNT = '{{.Data.snowflake_account}}'
-env.SNOWSQL_WAREHOUSE = '{{.Data.snowflake_warehouse}}'
-env.SNOWSQL_ROLE = '{{.Data.snowflake_rolename}}'
-{{end}}

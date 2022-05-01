@@ -1,3 +1,0 @@
-FROM hadolint/hadolint:v1.23.0-3-g6eaea2a
-
-COPY hadolint.yaml /.hadolint.yaml

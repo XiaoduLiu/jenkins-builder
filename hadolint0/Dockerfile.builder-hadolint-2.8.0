@@ -1,3 +1,0 @@
-FROM hadolint/hadolint:2.8.0-alpine
-
-COPY hadolint.yaml /.hadolint.yaml

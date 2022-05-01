@@ -1,8 +1,0 @@
---index-url https://artifactory.westernasset.com/artifactory/api/pypi/pypi-repo/simple
-pytest==5.4.2
-pytest-mock==3.1.0
-pytest-cov==2.8.1
-pylint==2.5.2
-bandit==1.6.2
-pytest-mccabe==1.0
-requirements-parser==0.2.0

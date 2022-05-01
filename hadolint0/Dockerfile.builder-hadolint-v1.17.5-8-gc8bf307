@@ -1,2 +1,0 @@
-FROM hadolint/hadolint:v1.17.5-8-gc8bf307
-LABEL maintainer louie.liu@westernasset.com
