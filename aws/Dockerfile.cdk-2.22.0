@@ -28,7 +28,5 @@ ENV AWSCDK_VERSION 2.22.0
 RUN npm install -g update
 RUN npm config set unsafe-perm true
 RUN npm install -g aws-cdk@${AWSCDK_VERSION}
-RUN npm install typescript@latest
-RUN npm install @types/node@latest
 
 USER jenkins
