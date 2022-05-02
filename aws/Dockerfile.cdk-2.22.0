@@ -14,10 +14,10 @@ ENV LANG C.UTF-8
 RUN usermod -u 1001 node
 RUN useradd -d "${home}" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}"
 
-RUN sudo add-apt-repository main
-RUN sudo add-apt-repository universe
-RUN sudo add-apt-repository restricted
-RUN sudo add-apt-repository multiverse  
+RUN add-apt-repository main
+RUN add-apt-repository universe
+RUN add-apt-repository restricted
+RUN add-apt-repository multiverse  
 RUN apt-get update
 RUN apt-get install -y git unzip gcc jq
 RUN apt-get clean
