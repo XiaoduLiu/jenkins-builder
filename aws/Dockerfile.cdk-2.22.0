@@ -1,4 +1,4 @@
-FROM docker.devops.aws.aristotlecap.com/node:17.8.0-buster
+FROM docker.devops.aws.aristotlecap.com/node:18.0.0-buster
 LABEL maintainer="devops@aristotlecap.com"
 
 # Create the jenkins user & group.
@@ -14,10 +14,6 @@ ENV LANG C.UTF-8
 RUN usermod -u 1001 node
 RUN useradd -d "${home}" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}"
 
-RUN add-apt-repository main
-RUN add-apt-repository universe
-RUN add-apt-repository restricted
-RUN add-apt-repository multiverse  
 RUN apt-get update
 RUN apt-get install -y git unzip gcc jq
 RUN apt-get clean
