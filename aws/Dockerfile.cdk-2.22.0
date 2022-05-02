@@ -15,7 +15,7 @@ RUN usermod -u 1001 node
 RUN useradd -d "${home}" -u "${uid}" -g "${gid}" -m -s /bin/bash "${user}"
 
 RUN apt-get update
-RUN apt-get install -y git jq unzip gcc
+RUN apt-get install -y git unzip gcc
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
 
